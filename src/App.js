@@ -1,26 +1,52 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import Loading from './Loading';
+import { getPosts } from './RedditApi';
+import SearchForm from './SearchForm';
+import RedditCard from './RedditCard';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component
+{
+  constructor ()
+  {
+    super();
+
+    this.state = {
+      posts: [],
+      loading: false,
+      searchValue: ''
+    };
+  }
+
+  handleSearch = async (searchValue) => {
+
+    this.setState({ loading: true });
+
+    let [posts] = await Promise.all([
+      getPosts(searchValue)
+    ]);
+
+    this.setState({ posts, loading: false });
+  }
+
+  render()
+  {
+    return (
+      <div>
+
+        <SearchForm onSearch = {this.handleSearch} />
+        {this.state.loading && <Loading />}
+
+        <p></p>
+
+        <div>
+          {this.state.posts.map((post) => {
+            return <RedditCard post={post} key={post.id}/>
+          })}
+        </div>
+      </div>
+    );
+  }
 }
 
 export default App;
