@@ -14,12 +14,29 @@ class App extends React.Component
     this.state = {
       posts: [],
       loading: false,
-      searchValue: ''
+      searchArray: [],
+      counterNum: 0
     };
   }
 
   handleSearch = async (searchValue) => {
 
+    this.setState({ loading: true });
+
+    let [posts] = await Promise.all([
+      getPosts(searchValue)
+    ]);
+
+    this.setState(oldState => ({searchArray: [searchValue, ...oldState.searchArray]}));
+
+    this.setState({ posts, loading: false });
+  }
+
+  countClicks = () => {
+    this.setState(oldState => ({counterNum: oldState.counterNum + 1}));
+  }
+
+  applyPreviousSearch = async (searchValue) => {
     this.setState({ loading: true });
 
     let [posts] = await Promise.all([
@@ -34,16 +51,34 @@ class App extends React.Component
     return (
       <div>
 
+        <div id = "counter">
+
+          <h1> {this.state.counterNum} </h1>
+
+        </div>
+
         <SearchForm onSearch = {this.handleSearch} />
         {this.state.loading && <Loading />}
 
-        <p></p>
+        <div id = "searchList">
 
-        <div>
+          {this.state.searchArray.map((term) => {
+            return (
+              <button type="button" onClick={this.applyPreviousSearch.bind(this, term)}>
+                {term}
+              </button>
+              );
+            }
+          )}
+
+        </div>
+
+        <div onClick={this.countClicks} >
           {this.state.posts.map((post) => {
-            return <RedditCard post={post} key={post.id}/>
+            return <RedditCard post={post} key={post.id} onClick/>
           })}
         </div>
+
       </div>
     );
   }

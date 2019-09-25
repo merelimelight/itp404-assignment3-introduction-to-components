@@ -2,3 +2,15 @@ body
 {
     margin: 20px;
 }
+
+#counter
+{
+    float: right;
+}
+
+#searchList
+{
+    margin-top: 30px;
+    float: right;
+    clear: both;
+}
